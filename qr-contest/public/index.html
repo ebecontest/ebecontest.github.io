@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Contest</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .win {
+      color: green;
+      font-size: 24px;
+    }
+    .lose {
+      color: red;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the QR Contest!</h1>
+  
+  <!-- Name Input Form -->
+  <div id="name-form">
+    <label for="name">Enter your name:</label>
+    <input type="text" id="name" placeholder="Enter your name" required><br><br>
+    <button onclick="submitName()">Submit</button>
+  </div>
+
+  <div id="result-message"></div>
+
+  <script>
+    let userIP = ''; // Will be set when the user accesses the page
+    let hasParticipated = false;
+
+    // Get the user's IP address (this can be achieved on the server side but for simplicity, we use a placeholder)
+    userIP = '192.168.1.1'; // This should ideally come from the server-side logic
+
+    // Function to check if the user has already participated
+    async function checkParticipation() {
+      const response = await fetch(`/check-participation?ip=${userIP}`);
+      const data = await response.json();
+
+      if (data.hasParticipated) {
+        hasParticipated = true;
+        document.getElementById('result-message').innerText = 'You have already participated!';
+      }
+    }
+
+    // Submit the name and result after checking participation
+    async function submitName() {
+      const name = document.getElementById('name').value;
+
+      if (!name) {
+        alert('Please enter your name!');
+        return;
+      }
+
+      if (hasParticipated) {
+        return; // Prevent further participation if already submitted
+      }
+
+      // Simulate the result (win or lose)
+      const result = Math.random() > 0.9 ? 'win' : 'lose'; // 10% chance of winning
+
+      // Submit the result to the server
+      const response = await fetch('/submit-result', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, result, ip: userIP })
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        alert(data.error);
+      } else {
+        document.getElementById('result-message').innerHTML = `<div class="${result}">${data.message}</div>`;
+        hasParticipated = true; // Mark as participated
+      }
+    }
+
+    // Check if the user has already participated when the page loads
+    checkParticipation();
+  </script>
+</body>
+</html>
