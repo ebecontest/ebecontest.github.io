@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Contest</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 20%;
+    }
+    .win {
+      color: green;
+      font-size: 24px;
+    }
+    .lose {
+      color: red;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div id="message"></div>
+  <script>
+    const results = Array(10).fill("win").concat(Array(90).fill("lose")); 
+    const randomResult = results[Math.floor(Math.random() * results.length)];
+
+    const message = randomResult === "win" 
+      ? "🎉 Congratulations! You are a WINNER! 🎉" 
+      : "😢 Sorry, you didn’t win this time. Try again! 😢";
+
+    document.getElementById("message").innerHTML = 
+      `<div class="${randomResult}">${message}</div>`;
+  </script>
+</body>
+</html>
