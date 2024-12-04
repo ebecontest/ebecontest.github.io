@@ -69,4 +69,20 @@ app.post('/submit-result', (req, res) => {
     // If there are more than 10 winners, randomly reduce the winners to 10
     const winnerCodes = winners.map(winner => winner.code);
     const codesToRemove = winnerCodes.slice(10);
-    participants = participan
+    participants = participants.filter(participant => !codesToRemove.includes(participant.code));
+  }
+
+  // Save updated participants to the Excel file
+  saveParticipants();
+
+  res.json({ message: 'Your result has been saved!', result });
+});
+
+// Serve the static files (e.g., index.html)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+  loadParticipants(); // Load the participants data when the server starts
+});
