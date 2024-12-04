@@ -4,56 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Contest</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Keep the new stylesheet link -->
 </head>
 <body>
-    <div class="container">
-        <h1>Contest</h1>
-        <p>Enter your name to participate in the contest</p>
-        <form id="contest-form">
-            <label for="name">Your Name</label>
-            <input type="text" id="name" name="name" required>
-            <button type="submit">Submit</button>
-        </form>
-        <div id="result-message"></div>
-    </div>
+    <h1>Enter Your Code to Participate!</h1>
+    <form id="contest-form">
+        <label for="code">CODE:</label>
+        <input type="text" id="code" name="code" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="result"></div>
 
     <script>
-        const form = document.getElementById('contest-form');
-        const resultMessage = document.getElementById('result-message');
-
-        form.addEventListener('submit', async (event) => {
+        // Handle form submission
+        document.getElementById('contest-form').addEventListener('submit', function(event) {
             event.preventDefault();
-            const name = document.getElementById('name').value;
-            const ip = await getUserIp();
+            const code = document.getElementById('code').value;
 
-            // Make API request to submit result
-            try {
-                const response = await fetch('/submit-result', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name, ip }),
-                });
-
-                const data = await response.json();
-                if (data.result) {
-                    resultMessage.innerHTML = `Hello ${name}, you ${data.result}!`;
-                } else {
-                    resultMessage.innerHTML = `Sorry, there was an issue: ${data.error}`;
-                }
-            } catch (error) {
-                resultMessage.innerHTML = 'Error submitting result.';
-            }
+            // Check if the code is valid
+            fetch(`https://your-server-url/check-code?code=${code}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isValid) {
+                        // Submit the result for valid code
+                        fetch('https://your-server-url/submit-result', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code: code })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('result').innerText = `Your result: ${data.result}`;
+                        })
+                        .catch(error => console.error('Error:', error));
+                    } else {
+                        document.getElementById('result').innerText = 'Invalid code. Please try again.';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         });
-
-        // Function to get the user's IP address (can be different based on the environment)
-        async function getUserIp() {
-            const res = await fetch('https://api.ipify.org?format=json');
-            const data = await res.json();
-            return data.ip;
-        }
     </script>
 </body>
 </html>
