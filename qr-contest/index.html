@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Contest</title>
+</head>
+<body>
+    <h1>Enter Your Code to Participate!</h1>
+    <form id="contest-form">
+        <label for="code">CODE:</label>
+        <input type="text" id="code" name="code" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        // Handle form submission
+        document.getElementById('contest-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const code = document.getElementById('code').value;
+
+            // Check if the code is valid
+            fetch(`https://your-server-url/check-code?code=${code}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isValid) {
+                        // Submit the result for valid code
+                        fetch('https://your-server-url/submit-result', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code: code })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('result').innerText = `Your result: ${data.result}`;
+                        })
+                        .catch(error => console.error('Error:', error));
+                    } else {
+                        document.getElementById('result').innerText = 'Invalid code. Please try again.';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
