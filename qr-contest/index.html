@@ -8,7 +8,7 @@
 <body>
     <h1>Enter Your Code to Participate!</h1>
     <form id="contest-form">
-        <label for="code">CODE:</label>
+        <label for="code">Code:</label>
         <input type="text" id="code" name="code" required>
         <button type="submit">Submit</button>
     </form>
@@ -21,13 +21,15 @@
             event.preventDefault();
             const code = document.getElementById('code').value;
 
-            // Check if the code is valid
-            fetch(`https://your-server-url/check-code?code=${code}`)
+            // Check if the code has already been used
+            fetch(`https://your-app-url/check-participation?code=${code}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.isValid) {
-                        // Submit the result for valid code
-                        fetch('https://your-server-url/submit-result', {
+                    if (data.hasParticipated) {
+                        document.getElementById('result').innerText = 'This code has already been used.';
+                    } else {
+                        // Submit the result
+                        fetch('https://your-app-url/submit-result', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ code: code })
@@ -37,8 +39,6 @@
                             document.getElementById('result').innerText = `Your result: ${data.result}`;
                         })
                         .catch(error => console.error('Error:', error));
-                    } else {
-                        document.getElementById('result').innerText = 'Invalid code. Please try again.';
                     }
                 })
                 .catch(error => console.error('Error:', error));
