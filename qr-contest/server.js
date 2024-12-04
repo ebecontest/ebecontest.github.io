@@ -21,6 +21,13 @@ function loadParticipants() {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     participants = xlsx.utils.sheet_to_json(sheet);
   }
+  else {
+    // If the file doesn't exist, create it with an empty sheet
+    const newWorkbook = xlsx.utils.book_new();
+    const newWorksheet = xlsx.utils.aoa_to_sheet([["code", "result"]]); // Add headers
+    xlsx.utils.book_append_sheet(newWorkbook, newWorksheet, 'Results');
+    xlsx.writeFile(newWorkbook, resultsFilePath);
+  }
 }
 
 // Utility to save participants to an Excel file
