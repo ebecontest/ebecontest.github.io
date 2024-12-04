@@ -6,10 +6,10 @@
     <title>QR Contest</title>
 </head>
 <body>
-    <h1>Enter Your Name to Participate!</h1>
+    <h1>Enter Your Code to Participate!</h1>
     <form id="contest-form">
-        <label for="name">Your Name:</label>
-        <input type="text" id="name" name="name" required>
+        <label for="code">Your Unique Code:</label>
+        <input type="text" id="code" name="code" required>
         <button type="submit">Submit</button>
     </form>
 
@@ -19,31 +19,54 @@
         // Handle form submission
         document.getElementById('contest-form').addEventListener('submit', function(event) {
             event.preventDefault();
-            const name = document.getElementById('name').value;
-            const ip = '192.168.0.1'; // Replace with actual IP if possible (or get it via a method)
+            const code = document.getElementById('code').value;
 
-            // Check if the participant has already participated
-            fetch(`https://intriguing-fossil-concavenator.glitch.me/check-participation?ip=${ip}`)
+            // Check if the code is valid and whether it has already been used
+            fetch(`https://your-server-url/check-code?code=${code}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.hasParticipated) {
-                        document.getElementById('result').innerText = 'You have already participated.';
-                    } else {
-                        // Submit the result
-                        fetch('https://intriguing-fossil-concavenator.glitch.me/submit-result', {
+                    if (data.isValid) {
+                        // If the code is valid and hasn't been used
+                        fetch('https://your-server-url/submit-result', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name: name, ip: ip })
+                            body: JSON.stringify({ code: code })
                         })
                         .then(response => response.json())
                         .then(data => {
                             document.getElementById('result').innerText = `Your result: ${data.result}`;
                         })
                         .catch(error => console.error('Error:', error));
+                    } else {
+                        // Show an error if the code is not valid
+                        document.getElementById('result').innerText = 'Invalid code. Please try again.';
                     }
                 })
                 .catch(error => console.error('Error:', error));
         });
+
+        // Check for code in the URL and fetch the result if already participated
+        const urlParams = new URLSearchParams(window.location.search);
+        const codeFromUrl = urlParams.get('code');
+
+        if (codeFromUrl) {
+            fetch(`https://your-server-url/check-code?code=${codeFromUrl}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isValid) {
+                        // Fetch result if the code has already been used
+                        fetch(`https://your-server-url/get-result?code=${codeFromUrl}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.result) {
+                                    document.getElementById('result').innerText = `Your previous result: ${data.result}`;
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
     </script>
 </body>
 </html>
